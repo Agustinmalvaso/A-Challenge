@@ -13,15 +13,14 @@
       <button id="addItemButton"class="button button2" onclick="addItem()">Add Item</button>
       <div class= "buttonsRow">
         <button id="addTextButton" class="button button2" style="visibility: hidden;" onclick="addText()">Add Text</button>
-        <button id="addImageButton" class="button button2" style="visibility: hidden;">Add Image</button>
-        <button id="submitItemButton" class="button button2" style="visibility: hidden;" onclick="">Submit Item</button>
+        <button type="button" id="addImageButton" class="button button2" style="visibility: hidden;"> Add Image</button>
+        <input type="file" accept="image/*" name="image" id="real-button" onchange="loadFile(event)" hidden="hidden">
       </div>
-      <div class="counter">Counter: </div>
+      <div class="counter" id="counter">Counter: 0</div>
     </div>
 
     <div class = "mainContainer">
-      <input type="file" accept="image/*" name="image" id="real-button" onchange="loadFile(event)" hidden="hidden">
-      <button type="button" id="custom-button" class="customUploadImageButton" style="visibility: hidden;"> Choose a file</button>
+      <button id="submitItemButton" class="button button2" style="visibility: hidden;" onclick="submitItem()">Submit Item</button>
       <div id="items" class="container items-text">
       </div>
     </div>
@@ -70,6 +69,7 @@ body{
 .list-item{
   height: 400px;
   border-radius: 5px;
+  margin-top: 10px;
 }
 
 .button {
@@ -89,28 +89,12 @@ body{
   background-color: lightblue;
   color: black;
   border: 2px solid #008CBA;
+  border-radius: 10px;
 }
 
 .button2:hover {
   background-color: #008CBA;
   color: black;
-}
-
-.customUploadImageButton {
-  padding: 10px;
-  color: white;
-  background-color: #009578;
-  border: 1px solid #000;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.customImageButton:hover{
-  background-color: #00b28f;
-}
-
-.customImageButtonText {
-  margin-left:10px;
 }
 
 .counter{

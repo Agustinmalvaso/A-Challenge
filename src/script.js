@@ -4,8 +4,15 @@ var sortable = Sortable.create(listItems);
 var itemsAmount = 0;
 
 const realButton = document.getElementById('real-button');
-const customButton = document.getElementById('custom-button');
+const addImageButton = document.getElementById('addImageButton');
+var dataList = [];
 
+class Item {
+    constructor(text, image){
+        this.text = text;
+        this.image = image;
+    }
+};
 
 function addItem(){
 
@@ -14,7 +21,7 @@ function addItem(){
         return;
     }
 
-    switchButtonsVisibility();
+    switchAllButtonsVisibility();
 
     var newItem = createItem();
     var description = document.createElement('p');
@@ -38,34 +45,44 @@ function addText(){
         inputText = prompt(' Please enter a new description.');
     }
 
-    listItems.children[0].getElementsByTagName('p')[0].innerHTML = inputText;
-    console.log(listItems.childNodes.length-1);
+    listItems.children[itemsAmount-1].getElementsByTagName('p')[0].innerHTML = inputText;
+    // console.log(listItems.childNodes.length-1);
+    // console.log(listItems.children[itemsAmount-1]);
 }
 
-function switchButtonsVisibility(){
+function submitItem(){
+    var imageText = listItems.childNodes[itemsAmount].childNodes[0];
+    var imageSrc = listItems.childNodes[itemsAmount].childNodes[1].src;
 
-    if(document.getElementById('addTextButton').style.visibility == 'hidden'){
-        document.getElementById('addTextButton').style.visibility = 'visible';
-    }else{
-        document.getElementById('addTextButton').style.visibility = 'hidden';
+    if(imageText.textContent == ""){
+        alert('You must insert a text');
+        return;
     }
+
+    if(imageSrc == ""){
+        alert('You must have an image');
+        return;
+    }
+
+    var newItem = new Item(imageText.textContent, imageSrc);
+    dataList.push(newItem);
     
-    if(document.getElementById('addImageButton').style.visibility == 'hidden'){
-        document.getElementById('addImageButton').style.visibility = 'visible';
-    }else{
-        document.getElementById('addImageButton').style.visibility = 'hidden';
-    }
+    document.getElementById('counter').innerHTML = 'Counter: ' + itemsAmount;
 
-    if(document.getElementById('custom-button').style.visibility == 'hidden'){
-        document.getElementById('custom-button').style.visibility = 'visible';
-    }else{
-        document.getElementById('custom-button').style.visibility = 'hidden';
-    }
+    switchAllButtonsVisibility();
+}
 
-    if(document.getElementById('submitItemButton').style.visibility == 'hidden'){
-        document.getElementById('submitItemButton').style.visibility = 'visible';
+function switchAllButtonsVisibility(){
+    switchButtonVisibility('addTextButton');
+    switchButtonVisibility('addImageButton');
+    switchButtonVisibility('submitItemButton');
+}
+
+function switchButtonVisibility(id){
+    if(document.getElementById(id).style.visibility == 'hidden'){
+        document.getElementById(id).style.visibility = 'visible';
     }else{
-        document.getElementById('submitItemButton').style.visibility = 'hidden';
+        document.getElementById(id).style.visibility = 'hidden';
     }
 }
 
@@ -77,10 +94,10 @@ function createItem(){
     return newItem;
 }
 
-customButton.addEventListener('click', function(){
-    realButton.click();
-});
-
 var loadFile = function(event) {
 	document.getElementById('items').childNodes[itemsAmount].getElementsByTagName('img')[0].src = URL.createObjectURL(event.target.files[0]);
 };
+
+addImageButton.addEventListener('click', function(){
+    realButton.click();
+});
