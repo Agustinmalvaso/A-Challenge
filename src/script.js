@@ -1,7 +1,11 @@
-var el = document.getElementById('items');
-var sortable = Sortable.create(el);
+var listItems = document.getElementById('items');
+var sortable = Sortable.create(listItems);
 
 var itemsAmount = 0;
+
+const realButton = document.getElementById('real-button');
+const customButton = document.getElementById('custom-button');
+
 
 function addItem(){
 
@@ -15,8 +19,14 @@ function addItem(){
     var newItem = createItem();
     var description = document.createElement('p');
     newItem.appendChild(description);
+
+    var newImage = document.createElement('img');
+    newImage.setAttribute('id','image'+itemsAmount);
+    newImage.height = 320;
+    newImage.width = 320;
+    newItem.appendChild(newImage);
     
-    document.getElementById('items').appendChild(newItem);
+    listItems.appendChild(newItem);
 
     itemsAmount++;
 }
@@ -28,8 +38,8 @@ function addText(){
         inputText = prompt(' Please enter a new description.');
     }
 
-    document.getElementById('items').children[0].getElementsByTagName('p')[0].innerHTML = inputText;
-    console.log(document.getElementById('items').childNodes.length-1);
+    listItems.children[0].getElementsByTagName('p')[0].innerHTML = inputText;
+    console.log(listItems.childNodes.length-1);
 }
 
 function switchButtonsVisibility(){
@@ -46,10 +56,16 @@ function switchButtonsVisibility(){
         document.getElementById('addImageButton').style.visibility = 'hidden';
     }
 
-    if(document.getElementById('real-file').style.visibility == 'hidden'){
-        document.getElementById('real-file').style.visibility = 'visible';
+    if(document.getElementById('custom-button').style.visibility == 'hidden'){
+        document.getElementById('custom-button').style.visibility = 'visible';
     }else{
-        document.getElementById('real-file').style.visibility = 'hidden';
+        document.getElementById('custom-button').style.visibility = 'hidden';
+    }
+
+    if(document.getElementById('submitItemButton').style.visibility == 'hidden'){
+        document.getElementById('submitItemButton').style.visibility = 'visible';
+    }else{
+        document.getElementById('submitItemButton').style.visibility = 'hidden';
     }
 }
 
@@ -60,3 +76,11 @@ function createItem(){
     newItem.style.border = '2px solid lightblue';
     return newItem;
 }
+
+customButton.addEventListener('click', function(){
+    realButton.click();
+});
+
+var loadFile = function(event) {
+	document.getElementById('items').childNodes[itemsAmount].getElementsByTagName('img')[0].src = URL.createObjectURL(event.target.files[0]);
+};
