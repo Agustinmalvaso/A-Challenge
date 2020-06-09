@@ -1,17 +1,16 @@
-var listItems = document.getElementById('items');
-var dataList = [];
+let listItems = document.getElementById('items');
+let dataList = [];
 
-var currentItem;
-var isEditing = false;
-var itemsAmount = dataList.length;
+let currentItem;
+let isEditing = false;
 
-var sortable = Sortable.create(listItems, { 
+window.onload = loadListItems();
+
+let sortable = Sortable.create(listItems, { 
     onEnd: function() {
         updateDataList();
     }
 });
-
-loadListItems();
 
 function addItem(){
 
@@ -22,7 +21,7 @@ function addItem(){
 
     switchAllButtonsVisibility();
 
-    var newItem = createItem('','');
+    let newItem = createItem('','');
     currentItem = newItem;
     
     listItems.appendChild(newItem);
@@ -31,7 +30,7 @@ function addItem(){
 }
 
 function addText(){
-    var inputText = prompt('Enter a description: ');
+    let inputText = prompt('Enter a description: ');
     while(inputText.length < 1 || inputText.length > 300){
         alert('The description must be between 1-300 characters.');
         inputText = prompt(' Please enter a new description.');
@@ -41,43 +40,47 @@ function addText(){
 }
 
 function submitItem(){
-    var imageText = currentItem.getElementsByTagName('p')[0].innerHTML;
-    var imageSrc = currentItem.getElementsByTagName('img')[0].src;
+    if(!isEditing){
+        let imageText = currentItem.getElementsByTagName('p')[0].innerHTML;
+        let imageSrc = currentItem.getElementsByTagName('img')[0].src;
 
-    if(imageText == '' || imageText == 'Your Description'){
-        alert('You must insert a text');
-        return;
-    }
+        if(imageText == '' || imageText == 'Your Description'){
+            alert('You must insert a text');
+            return;
+        }
 
-    if(!imageSrc.startsWith('blob')){
-        alert('You must have an image');
-        return;
+        if(!imageSrc.startsWith('data')){
+            alert('You must have an image');
+            return;
+        }
+
+        let newItem = {imageText, imageSrc};
+        dataList.push(newItem);
+        
+        updateCounter();
+        
     }
-    
-    var newItem = {imageText, imageSrc, id: itemsAmount};
-    dataList.push(newItem);
-    
-    document.getElementById('counter').innerHTML = 'Counter: ' + itemsAmount;
 
     isEditing = false;
 
+    updateDataList();
+
     switchAllButtonsVisibility();
-    switchEditAndDeleteVisibility();
+    switchEditAndDeleteVisibility(currentItem);
 }
 
 function deleteItem(){
     listItems.removeChild(currentItem);    
     itemsAmount--;
-    document.getElementById('counter').innerHTML = 'Counter: ' + itemsAmount;
+    updateCounter();
 
     for (let i = 0; i < dataList.length; i++) {  
-        if(dataList[i].image == currentItem.getElementsByTagName('img')[0].src){
+        if(dataList[i].imageSrc == currentItem.getElementsByTagName('img')[0].src){
             dataList.splice(i,1);
         }    
     }
 
-    switchAllButtonsVisibility();
-    
+    localStorage.setItem('items',JSON.stringify(dataList));
 }
 
 function switchAllButtonsVisibility(){
@@ -94,19 +97,17 @@ function switchButtonVisibility(id){
     }
 }
 
-function switchEditAndDeleteVisibility(){
-    currentItem.querySelector('#editItemButton').style.visibility = 'visible';
-    currentItem.querySelector('#deleteItemButton').style.visibility = 'visible'
+function switchEditAndDeleteVisibility(item){
+    item.querySelector('#editItemButton').style.visibility = 'visible';
+    item.querySelector('#deleteItemButton').style.visibility = 'visible';
 }
 
 function createItem(newText,newImage){
-    var newItem = document.createElement('div');
-    newItem.setAttribute('id', itemsAmount);
+    let newItem = document.createElement('div');
     newItem.setAttribute('class', 'list-item');
     newItem.style.border = '2px solid lightblue';
 
-    var image = document.createElement('img');
-    image.setAttribute('id','image'+itemsAmount);
+    let image = document.createElement('img');
     image.height = 320;
     image.width = 320;
     newItem.appendChild(image);
@@ -116,11 +117,11 @@ function createItem(newText,newImage){
         newItem.getElementsByTagName('img')[0].src = newImage;
     }
 
-    var column = document.createElement('div');
+    let column = document.createElement('div');
     column.setAttribute('class','column-items');
     newItem.appendChild(column);
 
-    var description = document.createElement('p');
+    let description = document.createElement('p');
     column.appendChild(description);
     if(newText == ''){
         newItem.getElementsByTagName('p')[0].innerHTML = 'Your Description'
@@ -128,7 +129,7 @@ function createItem(newText,newImage){
         newItem.getElementsByTagName('p')[0].innerHTML = newText;
     }
     
-    var realEditButton = document.createElement('input');
+    let realEditButton = document.createElement('input');
     realEditButton.setAttribute('type','file');
     realEditButton.setAttribute('accept','image/*');
     realEditButton.setAttribute('id','realEditItemButton');
@@ -137,11 +138,11 @@ function createItem(newText,newImage){
     realEditButton.style.visibility = 'hidden';
     column.appendChild(realEditButton);
 
-    var row = document.createElement('div');
+    let row = document.createElement('div');
     row.setAttribute('class','row-items');
     column.appendChild(row);
 
-    var editButton = document.createElement('input');
+    let editButton = document.createElement('input');
     editButton.setAttribute('type','button');
     editButton.setAttribute('id','editItemButton');
     editButton.setAttribute('value','Edit Item');
@@ -151,52 +152,78 @@ function createItem(newText,newImage){
             alert('You have to finish the current item before interacting with another one');
             return;
         }
-
         if(isEditing){
             alert('You have to finish editing the current item before editing another one');
             return;
         }
-
         currentItem = editButton.closest('div.list-item');
         isEditing = true;
-
         switchAllButtonsVisibility();
     }, false);
     editButton.style.visibility = 'hidden';
     row.appendChild(editButton);
 
-    var deleteButton = document.createElement('input');
+    let deleteButton = document.createElement('input');
     deleteButton.setAttribute('type','button');
     deleteButton.setAttribute('id','deleteItemButton');
     deleteButton.setAttribute('value','Delete Item');
-    deleteButton.setAttribute('onclick','deleteItem()');
     deleteButton.setAttribute('class','deleteButton');
+    deleteButton.addEventListener('click', function (e) {
+        if(document.getElementById('addTextButton').style.visibility == 'visible'){
+            alert('You have to finish the current item before deleting another one');
+            return;
+        }
+        currentItem = deleteButton.closest('div.list-item'); 
+        deleteItem();
+    }, false);
     deleteButton.style.visibility = 'hidden';
     row.appendChild(deleteButton);
 
     return newItem;
 }
 
+function updateCounter(){
+    localStorage.setItem('counter',itemsAmount);
+    document.getElementById('counter').innerHTML = 'Counter: ' + itemsAmount;
+}
+
 function loadListItems() {
+    itemsAmount = localStorage.getItem('counter');
+    if(itemsAmount > 0){
+        document.getElementById('counter').innerText = 'Counter: ' + itemsAmount;
+        let localStorageDataList = localStorage.getItem('items');
+        dataList = JSON.parse(localStorageDataList);
+    }else{
+        localStorage.setItem('items','[]');
+    }
+    
     for (let i = 0; i < dataList.length; i++) {
-        listItems.appendChild(createItem(dataList[i].imageText,dataList[i].imageSrc,dataList[i].id));
+        let newItem = createItem(dataList[i].imageText,dataList[i].imageSrc)
+        switchEditAndDeleteVisibility(newItem);
+        listItems.appendChild(newItem);
     }
 }
 
 function updateDataList(){
     for (let i = 0; i < listItems.childNodes.length; i++) {              
-        dataList[i] = {imageText: listItems.childNodes[i].querySelector('p').innerHTML, imageSrc: listItems.childNodes[i].querySelector('img').src, id: listItems.childNodes[i].getAttribute('id')};
+        dataList[i] = {imageText: listItems.childNodes[i].querySelector('p').innerHTML, imageSrc: listItems.childNodes[i].querySelector('img').src};
     }
+    localStorage.setItem('items',JSON.stringify(dataList));
 }
 
 const realButton = document.getElementById('real-button');
 const addImageButton = document.getElementById('addImageButton');
 
-var loadFile = function(event) {
-    var newImg = new Image();
+let loadFile = function(event) {
+    let newImg = new Image();
     newImg.onload = function () {
         if(this.width == 320 && this.height == 320){
-            currentItem.getElementsByTagName('img')[0].src = URL.createObjectURL(event.target.files[0]);
+            let reader = new FileReader();    
+            reader.readAsDataURL(event.target.files[0]);
+            reader.onloadend = function() {
+                let base64data = reader.result;
+                currentItem.getElementsByTagName('img')[0].src = base64data;
+            }
         }else{
             alert('Wrong dimensions. It has to be 320x320');
         }
