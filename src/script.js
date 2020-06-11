@@ -107,6 +107,26 @@ function createItem(newText,newImage){
     newItem.setAttribute('class', 'list-item');
     newItem.style.border = '2px solid lightblue';
 
+    createImage(newItem, newImage);
+
+    let column = document.createElement('div');
+    column.setAttribute('class','column-items');
+    newItem.appendChild(column);
+
+    createDescription(newItem, newText, column);
+
+    let row = document.createElement('div');
+    row.setAttribute('class','row-items');
+    column.appendChild(row);
+
+    createEditButton(row);
+
+    createDeleteButton(row);
+
+    return newItem;
+}
+
+function createImage(newItem, newImage){
     let image = document.createElement('img');
     image.height = 320;
     image.width = 320;
@@ -116,11 +136,9 @@ function createItem(newText,newImage){
     }else{
         newItem.getElementsByTagName('img')[0].src = newImage;
     }
+}
 
-    let column = document.createElement('div');
-    column.setAttribute('class','column-items');
-    newItem.appendChild(column);
-
+function createDescription(newItem, newText, column){
     let description = document.createElement('p');
     column.appendChild(description);
     if(newText == ''){
@@ -128,20 +146,9 @@ function createItem(newText,newImage){
     }else{
         newItem.getElementsByTagName('p')[0].innerHTML = newText;
     }
-    
-    let realEditButton = document.createElement('input');
-    realEditButton.setAttribute('type','file');
-    realEditButton.setAttribute('accept','image/*');
-    realEditButton.setAttribute('id','realEditItemButton');
-    realEditButton.setAttribute('hidden','hidden');
-    realEditButton.style.marginLeft = '100px';
-    realEditButton.style.visibility = 'hidden';
-    column.appendChild(realEditButton);
+}
 
-    let row = document.createElement('div');
-    row.setAttribute('class','row-items');
-    column.appendChild(row);
-
+function createEditButton(row){
     let editButton = document.createElement('input');
     editButton.setAttribute('type','button');
     editButton.setAttribute('id','editItemButton');
@@ -162,7 +169,9 @@ function createItem(newText,newImage){
     }, false);
     editButton.style.visibility = 'hidden';
     row.appendChild(editButton);
+}
 
+function createDeleteButton(row){
     let deleteButton = document.createElement('input');
     deleteButton.setAttribute('type','button');
     deleteButton.setAttribute('id','deleteItemButton');
@@ -178,8 +187,6 @@ function createItem(newText,newImage){
     }, false);
     deleteButton.style.visibility = 'hidden';
     row.appendChild(deleteButton);
-
-    return newItem;
 }
 
 function updateCounter(){
